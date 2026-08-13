@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amber & Ash — Reservations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1C1E1A;
+    --ink-2:#242621;
+    --ink-3:#2E3129;
+    --paper:#ECE6D2;
+    --paper-2:#DFD8BC;
+    --brass:#B98A3E;
+    --brass-bright:#D6A857;
+    --ember:#B0472F;
+    --ember-bright:#C85C3F;
+    --sage:#69805F;
+    --sage-bright:#87A17C;
+    --text-on-ink:#ECE6D2;
+    --text-muted-on-ink:rgba(236,230,210,0.58);
+    --text-on-paper:#242621;
+    --text-muted-on-paper:rgba(36,38,33,0.6);
+    --line-on-ink:rgba(236,230,210,0.16);
+    --line-on-paper:rgba(36,38,33,0.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    color:var(--text-on-ink);
+    font-family:'IBM Plex Sans',sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .display{font-family:'Fraunces',serif;}
+  a{color:inherit;}
+  button{font-family:inherit;cursor:pointer;}
+  input,select,textarea{font-family:inherit;}
+
+  .app{max-width:640px;margin:0 auto;padding:0 18px 60px;}
+  .app.wide{max-width:920px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:22px 0 14px;flex-wrap:wrap;gap:10px;}
+  .brand{display:flex;flex-direction:column;gap:2px;}
+  .brand-mark{font-family:'Fraunces',serif;font-weight:600;font-style:italic;font-size:26px;letter-spacing:0.3px;color:var(--brass-bright);}
+  .brand-sub{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-muted-on-ink);}
+  .navpill{display:flex;gap:2px;background:var(--ink-2);border:1px solid var(--line-on-ink);border-radius:999px;padding:3px;flex-wrap:wrap;}
+  .navpill button{background:transparent;border:none;color:var(--text-muted-on-ink);font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:999px;letter-spacing:0.3px;transition:all .15s ease;}
+  .navpill button.active{background:var(--brass);color:var(--ink);}
+  .navpill.sub{margin-bottom:18px;}
+  .navpill.sub button{font-size:11.5px;padding:6px 11px;}
+
+  .hero-line{display:flex;align-items:center;gap:10px;margin:2px 0 22px;color:var(--text-muted-on-ink);font-size:12.5px;}
+  .hero-line .dot{width:6px;height:6px;border-radius:50%;background:var(--sage-bright);flex:none;}
+
+  .ticket{background:var(--paper);color:var(--text-on-paper);border-radius:14px;overflow:hidden;box-shadow:0 18px 40px -18px rgba(0,0,0,0.55);margin-bottom:16px;}
+  .ticket-body{padding:22px 22px 20px;}
+  .ticket-tear{height:14px;background-image:radial-gradient(circle, var(--ink) 3.2px, transparent 3.6px);background-size:16px 16px;background-position:center;background-repeat:repeat-x;background-color:var(--paper);}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:var(--brass);font-weight:600;margin-bottom:6px;}
+  h1.section-title{font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin:0 0 4px;}
+  .section-desc{font-size:13px;color:var(--text-muted-on-paper);margin:0 0 16px;line-height:1.5;}
+
+  label.field-label{display:block;font-size:11.5px;font-weight:600;letter-spacing:0.4px;text-transform:uppercase;color:var(--text-muted-on-paper);margin:0 0 6px;}
+  .field{margin-bottom:16px;}
+  input[type=text],input[type=tel],input[type=date],input[type=number],select,textarea{
+    width:100%;padding:11px 12px;border-radius:8px;border:1.5px solid var(--line-on-paper);
+    background:#fff;color:var(--text-on-paper);font-size:14.5px;outline:none;transition:border-color .15s ease;
+  }
+  textarea{resize:vertical;min-height:70px;}
+  input:focus,select:focus,textarea:focus{border-color:var(--brass);}
+  .stepper{display:flex;align-items:center;gap:10px;}
+  .stepper button{width:38px;height:38px;border-radius:8px;border:1.5px solid var(--line-on-paper);background:#fff;font-size:17px;font-weight:600;color:var(--text-on-paper);}
+  .stepper .pax-display{flex:1;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;}
+
+  .slot-session-label{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted-on-paper);margin:18px 0 8px;}
+  .slot-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .slot-btn{position:relative;text-align:left;padding:12px 12px;border-radius:9px;border:1.5px solid var(--line-on-paper);background:#fff;}
+  .slot-btn .t{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:15px;display:block;}
+  .slot-btn .s{font-size:10.5px;color:var(--text-muted-on-paper);display:block;margin-top:2px;letter-spacing:0.3px;}
+  .slot-btn.selected{border-color:var(--brass);background:#FBF3E1;box-shadow:0 0 0 2px rgba(185,138,62,0.25) inset;}
+  .slot-btn:disabled{opacity:0.4;cursor:not-allowed;}
+  .now-badge{position:absolute;top:-8px;right:8px;background:var(--ember);color:#fff;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:999px;}
+
+  .btn-primary{width:100%;padding:13px;border-radius:9px;border:none;background:var(--ink);color:var(--paper);font-weight:600;font-size:14.5px;letter-spacing:0.3px;margin-top:6px;}
+  .btn-primary:disabled{opacity:0.35;cursor:not-allowed;}
+  .btn-secondary{width:100%;padding:12px;border-radius:9px;border:1.5px solid var(--line-on-paper);background:transparent;color:var(--text-on-paper);font-weight:600;font-size:13.5px;margin-top:8px;}
+  .btn-ghost-ink{padding:9px 14px;border-radius:8px;border:1.5px solid var(--line-on-ink);background:transparent;color:var(--text-on-ink);font-size:12.5px;font-weight:600;}
+
+  .error-box{background:rgba(176,71,47,0.1);border:1px solid rgba(176,71,47,0.35);color:var(--ember);padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:14px;line-height:1.4;}
+  .info-box{background:rgba(105,128,95,0.12);border:1px solid rgba(105,128,95,0.4);color:var(--sage);padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:14px;line-height:1.4;}
+  .pending-box{background:rgba(214,168,87,0.12);border:1px solid rgba(214,168,87,0.4);color:var(--brass);padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:14px;line-height:1.5;}
+
+  .terms{display:flex;gap:10px;align-items:flex-start;background:var(--paper-2);padding:12px 13px;border-radius:9px;margin:16px 0 18px;}
+  .terms input{width:16px;height:16px;margin-top:2px;accent-color:var(--brass);}
+  .terms p{font-size:12px;line-height:1.55;color:var(--text-muted-on-paper);margin:0;}
+  .terms ul{margin:6px 0 0;padding-left:16px;}
+  .terms li{margin-bottom:3px;}
+
+  .stub-code{font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:600;letter-spacing:4px;color:var(--ink);margin:2px 0 2px;}
+  .stub-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;}
+  .stub-item .k{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted-on-paper);font-family:'IBM Plex Mono',monospace;}
+  .stub-item .v{font-size:15px;font-weight:600;margin-top:3px;}
+
+  .footer-note{text-align:center;color:var(--text-muted-on-ink);font-size:11.5px;line-height:1.6;margin-top:26px;}
+
+  .staff-pin-wrap{max-width:320px;margin:60px auto;text-align:center;}
+  .pin-input{letter-spacing:10px;text-align:center;font-size:22px;font-family:'IBM Plex Mono',monospace;}
+
+  .dash-summary{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+  .sum-chip{flex:1;min-width:130px;background:var(--ink-2);border:1px solid var(--line-on-ink);border-radius:10px;padding:12px 14px;}
+  .sum-chip .k{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted-on-ink);font-family:'IBM Plex Mono',monospace;}
+  .sum-chip .v{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;margin-top:3px;color:var(--brass-bright);}
+
+  .dash-date-row{display:flex;gap:8px;align-items:center;margin-bottom:18px;flex-wrap:wrap;}
+  .dash-date-row input[type=date]{flex:1;min-width:140px;background:var(--ink-2);border:1px solid var(--line-on-ink);color:var(--text-on-ink);}
+
+  .session-header{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:2px;text-transform:uppercase;color:var(--brass-bright);margin:22px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line-on-ink);}
+  .resv-row{background:var(--ink-2);border:1px solid var(--line-on-ink);border-radius:11px;padding:13px 14px;margin-bottom:9px;}
+  .resv-row.status-seated-ok{border-color:rgba(135,161,124,0.55);}
+  .resv-row.status-seated-warn{border-color:rgba(214,168,87,0.7);background:rgba(214,168,87,0.07);}
+  .resv-row.status-seated-over{border-color:rgba(200,92,63,0.8);background:rgba(200,92,63,0.1);}
+  .resv-row.status-done{opacity:0.45;}
+  .resv-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .resv-time{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:15px;color:var(--paper);}
+  .resv-late{color:var(--brass-bright);font-size:10.5px;font-weight:600;margin-left:6px;}
+  .resv-name{font-weight:600;font-size:15px;margin-top:2px;}
+  .resv-meta{font-size:12px;color:var(--text-muted-on-ink);margin-top:3px;}
+  .status-pill{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:999px;font-weight:600;white-space:nowrap;}
+  .pill-confirmed{background:rgba(236,230,210,0.1);color:var(--text-muted-on-ink);border:1px solid var(--line-on-ink);}
+  .pill-seated{background:rgba(135,161,124,0.18);color:var(--sage-bright);}
+  .pill-warn{background:rgba(214,168,87,0.2);color:var(--brass-bright);}
+  .pill-over{background:rgba(200,92,63,0.22);color:var(--ember-bright);}
+  .pill-cancelled{background:rgba(236,230,210,0.06);color:var(--text-muted-on-ink);text-decoration:line-through;}
+  .pill-noshow{background:rgba(200,92,63,0.15);color:var(--ember-bright);}
+  .pill-done{background:rgba(236,230,210,0.06);color:var(--text-muted-on-ink);}
+  .pill-pending{background:rgba(214,168,87,0.2);color:var(--brass-bright);}
+  .pill-flag{background:rgba(200,92,63,0.22);color:var(--ember-bright);}
+  .resv-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+  .act-btn{font-size:11.5px;font-weight:600;padding:6px 11px;border-radius:7px;border:1px solid var(--line-on-ink);background:transparent;color:var(--text-on-ink);}
+  .act-btn.primary{background:var(--brass);border-color:var(--brass);color:var(--ink);}
+  .act-btn.danger{border-color:rgba(200,92,63,0.6);color:var(--ember-bright);}
+  .empty-note{color:var(--text-muted-on-ink);font-size:13px;text-align:center;padding:30px 0;}
+
+  .settings-block{background:var(--ink-2);border:1px solid var(--line-on-ink);border-radius:11px;padding:14px;margin-bottom:14px;}
+  .settings-block h3{font-family:'Fraunces',serif;font-weight:600;font-size:15px;margin:0 0 4px;color:var(--paper);}
+  .table-row-edit{display:grid;grid-template-columns:1.1fr 0.7fr 1fr auto;gap:8px;align-items:center;margin-bottom:8px;}
+  .table-row-edit input,.table-row-edit select{background:var(--ink);border:1px solid var(--line-on-ink);color:var(--text-on-ink);padding:8px 9px;border-radius:7px;font-size:13px;}
+  .icon-btn{background:transparent;border:none;color:var(--ember-bright);font-size:17px;padding:4px;}
+  .chip{display:inline-block;background:var(--ink-3);border:1px solid var(--line-on-ink);border-radius:6px;padding:2px 7px;font-size:11px;margin:2px 3px 2px 0;font-family:'IBM Plex Mono',monospace;}
+  .tbl{width:100%;border-collapse:collapse;font-size:12.5px;}
+  .tbl th{text-align:left;color:var(--text-muted-on-ink);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:0.5px;padding:6px 8px;border-bottom:1px solid var(--line-on-ink);}
+  .tbl td{padding:8px;border-bottom:1px solid var(--line-on-ink);vertical-align:middle;}
+  .tbl input[type=text]{padding:6px 8px;font-size:12.5px;margin:0;}
+
+  @media (max-width:420px){
+    .slot-grid{grid-template-columns:1fr 1fr;}
+    .brand-mark{font-size:22px;}
+    .table-row-edit{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+/* =========================================================================
+   AMBER & ASH — RESERVATION / QUEUE MANAGEMENT SYSTEM
+   ========================================================================= */
+
+const DEFAULT_NAME = "Amber & Ash";
+const DEFAULT_PHONE = "+60 12-345 6789";
+const DEFAULT_PIN = "1868";
+const MAX_PAX = 12;
+
+const SESSION_DEFS = {
+  lunch:  { label: "Lunch Service",  open: [11,30], close: [14,30], days: [0,6] },
+  dinner: { label: "Dinner Service", open: [18,0],  close: [22,30], days: [2,3,4,5,6,0] }
+};
+const SESSION_ORDER = ["lunch","dinner"];
+
+const DEFAULT_TABLES = [
+  {id:"A1",cap:2,group:null},{id:"A2",cap:2,group:null},{id:"A3",cap:2,group:null},
+  {id:"A4",cap:2,group:null},{id:"A5",cap:2,group:null},{id:"A6",cap:2,group:null},
+  {id:"B1",cap:4,group:null},{id:"B2",cap:4,group:null},{id:"B3",cap:4,group:null},{id:"B4",cap:4,group:null},
+  {id:"C1",cap:6,group:null},{id:"C2",cap:6,group:null},{id:"C3",cap:6,group:null},{id:"C4",cap:6,group:null},
+  {id:"D1",cap:8,group:null}
+];
+const DEFAULT_SETTINGS = {
+  pin: DEFAULT_PIN,
+  restaurantName: DEFAULT_NAME,
+  restaurantPhone: DEFAULT_PHONE,
+  maxPaxPerSlot: 30,
+  terms: [
+    "Please arrive on time — we can only seat your full party once everyone has arrived.",
+    "Each seating is held for 90 minutes.",
+    "Reservations can be changed or cancelled free of charge up to 1 hour before your seating time, via Manage Booking.",
+    "No deposit needed — we just ask you to honour your booking."
+  ]
+};
+
+/* ---------------- time helpers ---------------- */
+function ymd(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function todayObj(){ return new Date(); }
+function nowMinutes(){ const n=new Date(); return n.getHours()*60+n.getMinutes(); }
+function fmtTime(mins){
+  let h=Math.floor(mins/60), m=mins%60;
+  const ap = h>=12?"PM":"AM";
+  let h12 = h%12; if(h12===0) h12=12;
+  return h12+":"+String(m).padStart(2,"0")+" "+ap;
+}
+function fmtDateLong(dateStr){
+  const [y,m,d]=dateStr.split("-").map(Number);
+  const dt=new Date(y,m-1,d);
+  return dt.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
+}
+function slotsFor(sessionKey){
+  const {open,close}=SESSION_DEFS[sessionKey];
+  const openMin=open[0]*60+open[1], closeMin=close[0]*60+close[1];
+  const slots=[]; let t=openMin;
+  while(t+90<=closeMin){ slots.push(t); t+=45; }
+  return slots;
+}
+function sessionsForDateStr(dateStr){
+  const [y,m,d]=dateStr.split("-").map(Number);
+  const dow = new Date(y,m-1,d).getDay();
+  return SESSION_ORDER.filter(k=>SESSION_DEFS[k].days.includes(dow));
+}
+function isToday(dateStr){ return dateStr===ymd(todayObj()); }
+function genCode(){
+  const chars="ACDEFGHJKLMNPQRTUVWXY34679";
+  let s=""; for(let i=0;i<6;i++) s+=chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+function genId(){ return "r_"+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function normPhone(p){ return String(p||"").replace(/\D/g,""); }
+
+/* ---------------- closures ---------------- */
+function isDateClosed(dateStr){ return state.closures.some(c=>c.date===dateStr && c.session===null && c.slot===null); }
+function isSessionClosed(dateStr, session){ return isDateClosed(dateStr) || state.closures.some(c=>c.date===dateStr && c.session===session && c.slot===null); }
+function isSlotClosed(dateStr, session, slot){ return isSessionClosed(dateStr, session) || state.closures.some(c=>c.date===dateStr && c.session===session && c.slot===slot); }
+
+/* ---------------- allocation engine ---------------- */
+function combos(arr,size){
+  const results=[];
+  (function rec(start,chosen){
+    if(chosen.length===size){ results.push(chosen.slice()); return; }
+    for(let i=start;i<arr.length;i++){ chosen.push(arr[i]); rec(i+1,chosen); chosen.pop(); }
+  })(0,[]);
+  return results;
+}
+function occupiedTableIds(reservations, date, session, slots, slotIdx, excludeId){
+  const relevant = new Set([slotIdx]);
+  if(slotIdx>0) relevant.add(slotIdx-1);
+  const ids = new Set();
+  reservations.forEach(r=>{
+    if(excludeId && r.id===excludeId) return;
+    if(r.date===date && r.session===session && (r.status==="confirmed"||r.status==="seated")){
+      const idx = slots.indexOf(r.slot);
+      if(relevant.has(idx)) (r.tables||[]).forEach(t=>ids.add(t));
+    }
+  });
+  return ids;
+}
+function findAllocation(pax, tables, occupiedIds){
+  const free = tables.filter(t=>!occupiedIds.has(t.id));
+  const buckets = {};
+  free.forEach(t=>{ const key = t.group ? ("g:"+t.group) : ("t:"+t.id); (buckets[key]=buckets[key]||[]).push(t); });
+  let best=null;
+  Object.values(buckets).forEach(bucket=>{
+    const sorted = bucket.slice().sort((a,b)=>a.cap-b.cap);
+    const maxSize = Math.min(6, sorted.length);
+    for(let size=1; size<=maxSize; size++){
+      let localBest=null;
+      combos(sorted,size).forEach(combo=>{
+        const sum=combo.reduce((s,t)=>s+t.cap,0);
+        if(sum>=pax){ const waste=sum-pax; if(!localBest||waste<localBest.waste) localBest={combo,waste}; }
+      });
+      if(localBest){
+        if(!best || localBest.waste<best.waste || (localBest.waste===best.waste && localBest.combo.length<best.combo.length)) best=localBest;
+        break;
+      }
+    }
+  });
+  return best ? best.combo : null;
+}
+function slotSessionPax(date, session, slot, excludeId){
+  return state.reservations.filter(r=>r.date===date && r.session===session && r.slot===slot && r.id!==excludeId && (r.status==="confirmed"||r.status==="seated"))
+    .reduce((s,r)=>s+r.pax,0);
+}
+function slotFeasible(date, session, slot, pax, excludeId){
+  if(isSlotClosed(date, session, slot)) return null;
+  const bookedPax = slotSessionPax(date, session, slot, excludeId);
+  if(bookedPax + pax > state.settings.maxPaxPerSlot) return null;
+  const slots = slotsFor(session);
+  const idx = slots.indexOf(slot);
+  const occ = occupiedTableIds(state.reservations, date, session, slots, idx, excludeId);
+  return findAllocation(pax, state.tables, occ);
+}
+function computeNowTag(dateStr){
+  if(dateStr!==ymd(todayObj())) return null;
+  const nowM = nowMinutes();
+  let allSlots = [];
+  sessionsForDateStr(dateStr).forEach(sKey=>{
+    if(isSessionClosed(dateStr,sKey)) return;
+    slotsFor(sKey).forEach(sl=>{ if(!isSlotClosed(dateStr,sKey,sl)) allSlots.push({session:sKey, slot:sl}); });
+  });
+  allSlots.sort((a,b)=>a.slot-b.slot);
+  if(allSlots.length===0) return null;
+  if(nowM < allSlots[0].slot) return allSlots[0];
+  for(const x of allSlots){ if(nowM>=x.slot && nowM<x.slot+45) return x; }
+  return null;
+}
+function customerFlag(phone){ return state.customerNotes[normPhone(phone)] || {flagged:false, note:""}; }
+
+/* ---------------- storage layer ---------------- */
+async function loadTablesConfig(){
+  try{
+    const r = await window.storage.get("tables-config", true);
+    if(r && r.value){
+      const val = JSON.parse(r.value);
+      if(Array.isArray(val)) return { tables: val.map(t=>({...t, group:t.group||null})), groups: [] };
+      return { tables: (val.tables||[]).map(t=>({...t, group:t.group||null})), groups: val.groups||[] };
+    }
+  }catch(e){}
+  return { tables: DEFAULT_TABLES.map(t=>({...t})), groups: [] };
+}
+async function saveTablesConfig(){ await window.storage.set("tables-config", JSON.stringify({tables:state.tables, groups:state.groups}), true); }
+async function loadReservations(){
+  try{ const r = await window.storage.get("reservations", true); if(r && r.value) return JSON.parse(r.value); }catch(e){}
+  return [];
+}
+async function saveReservations(list){ await window.storage.set("reservations", JSON.stringify(list), true); }
+async function loadSettings(){
+  try{ const r = await window.storage.get("settings", true); if(r && r.value) return {...DEFAULT_SETTINGS, ...JSON.parse(r.value)}; }catch(e){}
+  return {...DEFAULT_SETTINGS};
+}
+async function saveSettings(s){ await window.storage.set("settings", JSON.stringify(s), true); }
+async function loadCustomerNotes(){
+  try{ const r = await window.storage.get("customer-notes", true); if(r && r.value) return JSON.parse(r.value); }catch(e){}
+  return {};
+}
+async function saveCustomerNotes(){ await window.storage.set("customer-notes", JSON.stringify(state.customerNotes), true); }
+async function loadClosures(){
+  try{ const r = await window.storage.get("closures", true); if(r && r.value) return JSON.parse(r.value); }catch(e){}
+  return [];
+}
+async function saveClosures(){ await window.storage.set("closures", JSON.stringify(state.closures), true); }
+
+/* ---------------- app state ---------------- */
+const state = {
+  view: "reserve",
+  tables: [], groups: [], reservations: [], settings: {...DEFAULT_SETTINGS}, customerNotes: {}, closures: [],
+  loaded:false,
+
+  rDate: ymd(todayObj()), rPax: 2, rSession: null, rSlot: null,
+  rName:"", rPhone:"", rEmail:"", rAgree:false, rError:"", rConfirmed:null,
+
+  mPhone:"", mEmail:"", mResults:null, mError:"", mMsg:"",
+  mEditingId:null, mEditDate:"", mEditPax:2, mEditSession:null, mEditSlot:null, mEditError:"",
+
+  staffAuthed:false, pinInput:"", pinError:"",
+  dashDate: ymd(todayObj()), dashRangeFrom: ymd(todayObj()), dashRangeTo: ymd(todayObj()),
+  staffTab:"board",
+  editTables:null, newPin:"", settingsMsg:"", groupError:"",
+  groupEditor:{id:null,name:"",members:new Set()},
+  clDate: ymd(todayObj())
+};
+
+async function bootstrap(){
+  const cfg = await loadTablesConfig();
+  state.tables = cfg.tables; state.groups = cfg.groups;
+  state.reservations = await loadReservations();
+  state.settings = await loadSettings();
+  state.customerNotes = await loadCustomerNotes();
+  state.closures = await loadClosures();
+  state.loaded = true;
+  render();
+}
+async function refreshData(){
+  const cfg = await loadTablesConfig();
+  state.tables = cfg.tables; state.groups = cfg.groups;
+  state.reservations = await loadReservations();
+  state.closures = await loadClosures();
+}
+
+/* ---------------- render root ---------------- */
+function render(){
+  const root=document.getElementById("root");
+  if(!state.loaded){ root.innerHTML = '<div class="app"><p class="footer-note" style="margin-top:80px;">Loading…</p></div>'; return; }
+  const wide = state.view==="staff" ? " wide" : "";
+  root.innerHTML = '<div class="app'+wide+'">'+innerAppContent()+'<p class="footer-note">'+escapeHtml(state.settings.restaurantName)+' · '+escapeHtml(state.settings.restaurantPhone)+'</p></div>';
+}
+function innerAppContent(){
+  let html = renderTopbarInner();
+  if(state.view==="reserve") html += renderReserveInner();
+  else if(state.view==="manage") html += renderManageInner();
+  else if(state.view==="staffgate") html += renderStaffGateInner();
+  else if(state.view==="staff") html += renderStaffInner();
+  return html;
+}
+function renderTopbarInner(){
+  const nav = (state.view==="staff" || state.view==="staffgate") ? "staff" : state.view;
+  return `
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">${escapeHtml(state.settings.restaurantName)}</div>
+        <div class="brand-sub">Reservations &amp; Table Queue</div>
+      </div>
+      <div class="navpill">
+        <button class="${nav==='reserve'?'active':''}" onclick="goto('reserve')">Reserve</button>
+        <button class="${nav==='manage'?'active':''}" onclick="goto('manage')">Manage</button>
+        <button class="${nav==='staff'?'active':''}" onclick="goto(state.staffAuthed?'staff':'staffgate')">Staff</button>
+      </div>
+    </div>
+  `;
+}
+window.goto = function(v){
+  state.view=v;
+  state.rError=""; state.mError=""; state.mMsg=""; state.pinError="";
+  render();
+};
+
+/* =========================================================================
+   RESERVE FLOW
+   ========================================================================= */
+function renderSlotPicker(dateStr, pax, selSession, selSlot, excludeId, pickFnName){
+  const sessions = sessionsForDateStr(dateStr);
+  if(isDateClosed(dateStr)) return `<div class="error-box">We're closed on this date. Please pick another day.</div>`;
+  if(sessions.length===0) return `<div class="error-box">We're closed on this date — we're open Tuesday to Sunday (closed Mondays).</div>`;
+  const nowTag = computeNowTag(dateStr);
+  const nowM = nowMinutes();
+  let html = "";
+  sessions.forEach(sKey=>{
+    if(isSessionClosed(dateStr, sKey)) return;
+    const slots = slotsFor(sKey);
+    let buttons = "";
+    slots.forEach((slotMin, idx)=>{
+      if(isSlotClosed(dateStr, sKey, slotMin)) return;
+      const occ = occupiedTableIds(state.reservations, dateStr, sKey, slots, idx, excludeId);
+      const alloc = findAllocation(pax, state.tables, occ);
+      const bookedPax = slotSessionPax(dateStr, sKey, slotMin, excludeId);
+      const overCap = bookedPax + pax > state.settings.maxPaxPerSlot;
+      const elapsedToday = isToday(dateStr) && nowM >= (slotMin+45);
+      const isNow = nowTag && nowTag.session===sKey && nowTag.slot===slotMin;
+      const disabled = elapsedToday || !alloc || overCap;
+      const selected = selSession===sKey && selSlot===slotMin;
+      const subLabel = elapsedToday ? "Ended" : (disabled ? "Full" : "Available");
+      buttons += `<button type="button" class="slot-btn ${selected?'selected':''}" ${disabled?'disabled':''} onclick="${pickFnName}('${sKey}', ${slotMin})">
+        ${isNow && !disabled?'<span class="now-badge">NOW</span>':''}
+        <span class="t">${fmtTime(slotMin)}</span><span class="s">${subLabel}</span></button>`;
+    });
+    if(buttons) html += `<div class="slot-session-label">${SESSION_DEFS[sKey].label}</div><div class="slot-grid">${buttons}</div>`;
+  });
+  return html || `<div class="error-box">No seatings available for this date.</div>`;
+}
+
+function renderReserveInner(){
+  if(state.rConfirmed) return renderTicketInner(state.rConfirmed);
+  const dateStr = state.rDate;
+  const minDate = ymd(todayObj());
+  const slotsHtml = renderSlotPicker(dateStr, state.rPax, state.rSession, state.rSlot, null, "pickSlot");
+  const canProceedToDetails = state.rSession!==null && state.rSlot!==null;
+
+  let detailsHtml = "";
+  if(canProceedToDetails){
+    const termsLi = state.settings.terms.map(t=>`<li>${escapeHtml(t)}</li>`).join("");
+    detailsHtml = `
+      <div class="slot-session-label" style="margin-top:22px;">Your Details</div>
+      <div class="field">
+        <label class="field-label">Full Name</label>
+        <input type="text" value="${escapeAttr(state.rName)}" placeholder="e.g. Alex Tan" oninput="state.rName=this.value">
+      </div>
+      <div class="field">
+        <label class="field-label">Contact Number</label>
+        <input type="tel" value="${escapeAttr(state.rPhone)}" placeholder="e.g. 012-345 6789" oninput="state.rPhone=this.value">
+      </div>
+      <div class="field">
+        <label class="field-label">Email</label>
+        <input type="text" value="${escapeAttr(state.rEmail)}" placeholder="e.g. name@email.com" oninput="state.rEmail=this.value">
+      </div>
+      <div class="terms">
+        <input type="checkbox" id="agree" ${state.rAgree?'checked':''} onchange="state.rAgree=this.checked; render();">
+        <p>I agree to the reservation terms:<ul>${termsLi}</ul></p>
+      </div>
+      ${state.rError?`<div class="error-box">${state.rError}</div>`:""}
+      <button class="btn-primary" ${(!state.rName||!state.rPhone||!state.rEmail||!state.rAgree)?'disabled':''} onclick="submitReservation()">Confirm Reservation</button>
+    `;
+  }
+
+  return `
+    <div class="hero-line"><span class="dot"></span> Seated only once your full party has arrived · each seating runs 90 minutes</div>
+    <div class="ticket">
+      <div class="ticket-body">
+        <div class="eyebrow">Step 1</div>
+        <h1 class="section-title">When &amp; how many</h1>
+        <p class="section-desc">Pick a date and party size — we'll show you which seating times still have room. Need to change or cancel later? Use the Manage tab.</p>
+        <div class="field">
+          <label class="field-label">Date</label>
+          <input type="date" value="${dateStr}" min="${minDate}" onchange="changeDate(this.value)">
+        </div>
+        <div class="field">
+          <label class="field-label">Party Size (max ${MAX_PAX})</label>
+          <div class="stepper">
+            <button type="button" onclick="changePax(-1)">−</button>
+            <div class="pax-display">${state.rPax} pax</div>
+            <button type="button" onclick="changePax(1)">+</button>
+          </div>
+        </div>
+        <div class="slot-session-label" style="margin-top:4px;">Choose a Seating Time</div>
+        ${slotsHtml}
+        ${detailsHtml}
+      </div>
+    </div>
+  `;
+}
+window.changeDate = function(v){ state.rDate=v; state.rSession=null; state.rSlot=null; render(); };
+window.changePax = function(d){
+  state.rPax = Math.max(1, Math.min(MAX_PAX, state.rPax+d));
+  state.rSession=null; state.rSlot=null;
+  render();
+};
+window.pickSlot = function(sKey, slotMin){ state.rSession=sKey; state.rSlot=slotMin; state.rError=""; render(); };
+
+window.submitReservation = async function(){
+  state.rError="";
+  if(!state.rName.trim() || !state.rPhone.trim() || !state.rEmail.trim()){ state.rError="Please fill in your name, contact number and email."; render(); return; }
+  if(!/^\S+@\S+\.\S+$/.test(state.rEmail.trim())){ state.rError="Please enter a valid email address."; render(); return; }
+  await refreshData();
+  const alloc = slotFeasible(state.rDate, state.rSession, state.rSlot, state.rPax, null);
+  if(!alloc){
+    state.rError = "Sorry — that seating time just filled up. Please choose another slot.";
+    state.rSession=null; state.rSlot=null;
+    render(); return;
+  }
+  const resv = {
+    id: genId(), code: genCode(), name: state.rName.trim(), phone: state.rPhone.trim(), email: state.rEmail.trim(),
+    pax: state.rPax, date: state.rDate, session: state.rSession, slot: state.rSlot,
+    tables: alloc.map(t=>t.id), status: "confirmed", seatedAt: null, createdAt: Date.now(), pending: null
+  };
+  state.reservations.push(resv);
+  await saveReservations(state.reservations);
+  state.rConfirmed = resv;
+  render();
+};
+
+function renderTicketInner(resv){
+  return `
+    <div class="ticket">
+      <div class="ticket-body">
+        <div class="eyebrow">Reservation Confirmed</div>
+        <h1 class="section-title">See you soon, ${escapeHtml(resv.name.split(" ")[0])}.</h1>
+        <p class="section-desc">Show this confirmation code at the door. No need to print anything.</p>
+        <div class="stub-code">${resv.code}</div>
+        <div class="stub-grid">
+          <div class="stub-item"><div class="k">Date</div><div class="v">${fmtDateLong(resv.date)}</div></div>
+          <div class="stub-item"><div class="k">Time</div><div class="v">${fmtTime(resv.slot)}</div></div>
+          <div class="stub-item"><div class="k">Party</div><div class="v">${resv.pax} pax</div></div>
+          <div class="stub-item"><div class="k">Service</div><div class="v">${SESSION_DEFS[resv.session].label}</div></div>
+        </div>
+      </div>
+      <div class="ticket-tear"></div>
+      <div class="ticket-body">
+        <p style="font-size:12px;color:var(--text-muted-on-paper);line-height:1.6;margin:0;">
+          Please arrive on time — we can only seat your full party once everyone has arrived, and each seating runs for 90 minutes.
+          Need to change or cancel? Head to <b>Manage Booking</b> up to 1 hour before your seating time.
+        </p>
+      </div>
+    </div>
+    <button class="btn-secondary" onclick="newReservation()">Make Another Reservation</button>
+  `;
+}
+window.newReservation = function(){
+  state.rConfirmed=null; state.rName=""; state.rPhone=""; state.rEmail=""; state.rAgree=false;
+  state.rSession=null; state.rSlot=null;
+  render();
+};
+
+/* =========================================================================
+   MANAGE / CANCEL / RESCHEDULE FLOW
+   ========================================================================= */
+function renderManageInner(){
+  if(state.mResults){
+    if(state.mResults.length===0){
+      return `<div class="ticket"><div class="ticket-body">
+        <div class="eyebrow">No Bookings Found</div>
+        <h1 class="section-title">Nothing upcoming for these details</h1>
+        <p class="section-desc">Double-check the phone number and email you booked with.</p>
+        <button class="btn-secondary" onclick="resetManage()">Search Again</button>
+      </div></div>`;
+    }
+    return state.mResults.map(r => renderManageCard(r)).join("") + `<button class="btn-secondary" onclick="resetManage()">Search Again</button>`;
+  }
+  return `
+    <div class="ticket">
+      <div class="ticket-body">
+        <div class="eyebrow">Manage Booking</div>
+        <h1 class="section-title">Find your reservation</h1>
+        <p class="section-desc">Enter the phone number and email you booked with. Changes and cancellations are accepted up to 1 hour before your seating time.</p>
+        <div class="field">
+          <label class="field-label">Contact Number</label>
+          <input type="tel" value="${escapeAttr(state.mPhone)}" placeholder="e.g. 012-345 6789" oninput="state.mPhone=this.value">
+        </div>
+        <div class="field">
+          <label class="field-label">Email</label>
+          <input type="text" value="${escapeAttr(state.mEmail)}" placeholder="e.g. name@email.com" oninput="state.mEmail=this.value">
+        </div>
+        ${state.mError?`<div class="error-box">${state.mError}</div>`:""}
+        <button class="btn-primary" onclick="findBooking()">Find Booking</button>
+      </div>
+    </div>
+  `;
+}
+window.resetManage = function(){ state.mResults=null; state.mMsg=""; state.mError=""; state.mEditingId=null; render(); };
+window.findBooking = async function(){
+  state.mError="";
+  if(!state.mPhone.trim() || !state.mEmail.trim()){ state.mError="Please enter both your contact number and email."; render(); return; }
+  await refreshData();
+  const nowMs = Date.now();
+  const matches = state.reservations.filter(r=>{
+    if(normPhone(r.phone)!==normPhone(state.mPhone)) return false;
+    if((r.email||"").toLowerCase()!==state.mEmail.trim().toLowerCase()) return false;
+    if(r.status!=="confirmed") return false;
+    const [y,m,d]=r.date.split("-").map(Number);
+    const slotEndMs = new Date(y,m-1,d, Math.floor(r.slot/60), r.slot%60).getTime() + 90*60000;
+    return slotEndMs > nowMs;
+  });
+  matches.sort((a,b)=> (a.date+String(a.slot).padStart(4,"0")).localeCompare(b.date+String(b.slot).padStart(4,"0")));
+  state.mResults = matches;
+  render();
+};
+
+function renderManageCard(r){
+  const [yy,mm,dd] = r.date.split("-").map(Number);
+  const slotDate = new Date(yy, mm-1, dd, Math.floor(r.slot/60), r.slot%60, 0, 0);
+  const cutoff = slotDate.getTime() - 60*60*1000;
+  const canModify = Date.now() < cutoff;
+
+  if(state.mEditingId===r.id){
+    const slotsHtml = renderSlotPicker(state.mEditDate, state.mEditPax, state.mEditSession, state.mEditSlot, r.id, "pickEditSlot");
+    return `<div class="ticket"><div class="ticket-body">
+      <div class="eyebrow">Reschedule</div>
+      <h1 class="section-title">${escapeHtml(r.name)}</h1>
+      <div class="field" style="margin-top:14px;">
+        <label class="field-label">Date</label>
+        <input type="date" value="${state.mEditDate}" min="${ymd(todayObj())}" onchange="changeEditDate(this.value)">
+      </div>
+      <div class="field">
+        <label class="field-label">Party Size (max ${MAX_PAX})</label>
+        <div class="stepper">
+          <button type="button" onclick="changeEditPax(-1)">−</button>
+          <div class="pax-display">${state.mEditPax} pax</div>
+          <button type="button" onclick="changeEditPax(1)">+</button>
+        </div>
+      </div>
+      <div class="slot-session-label">Choose a Seating Time</div>
+      ${slotsHtml}
+      ${state.mEditError?`<div class="error-box">${state.mEditError}</div>`:""}
+      <div style="display:flex;gap:8px;margin-top:6px;">
+        <button class="btn-secondary" style="margin-top:0;" onclick="cancelEditBooking()">Back</button>
+        <button class="btn-primary" style="margin-top:0;" ${(state.mEditSession===null)?'disabled':''} onclick="saveEditBooking('${r.id}')">Save Changes</button>
+      </div>
+    </div></div>`;
+  }
+
+  let body;
+  if(r.pending){
+    body = `<div class="pending-box">Requested change to <b>${r.pending.pax} pax</b> on ${fmtDateLong(r.pending.date)} at ${fmtTime(r.pending.slot)} is awaiting confirmation from us — we may need to rearrange tables.</div>
+      ${canModify ? `<button class="btn-primary" style="background:var(--ember);" onclick="doCancel('${r.id}')">Cancel This Reservation</button>` : ""}`;
+  } else if(canModify){
+    body = `
+      <div style="display:flex;gap:8px;">
+        <button class="btn-secondary" style="margin-top:0;" onclick="startEditBooking('${r.id}')">Change</button>
+        <button class="btn-primary" style="margin-top:0;background:var(--ember);" onclick="doCancel('${r.id}')">Cancel</button>
+      </div>`;
+  } else {
+    body = `<div class="error-box">This is within 1 hour of your seating time, so it can no longer be changed online. Please call us at ${escapeHtml(state.settings.restaurantPhone)}.</div>`;
+  }
+
+  return `
+    <div class="ticket">
+      <div class="ticket-body">
+        <div class="eyebrow">Booking Found · ${r.code}</div>
+        <h1 class="section-title">${escapeHtml(r.name)}</h1>
+        <div class="stub-grid">
+          <div class="stub-item"><div class="k">Date</div><div class="v">${fmtDateLong(r.date)}</div></div>
+          <div class="stub-item"><div class="k">Time</div><div class="v">${fmtTime(r.slot)}</div></div>
+          <div class="stub-item"><div class="k">Party</div><div class="v">${r.pax} pax</div></div>
+          <div class="stub-item"><div class="k">Table</div><div class="v">${r.tables.join(", ")}</div></div>
+        </div>
+        <div style="margin-top:18px;">${body}</div>
+        ${state.mMsg?`<div class="info-box" style="margin-top:12px;">${state.mMsg}</div>`:""}
+      </div>
+    </div>
+  `;
+}
+window.startEditBooking = function(id){
+  const r = state.reservations.find(x=>x.id===id);
+  state.mEditingId = id; state.mEditDate = r.date; state.mEditPax = r.pax;
+  state.mEditSession = null; state.mEditSlot = null; state.mEditError = "";
+  render();
+};
+window.cancelEditBooking = function(){ state.mEditingId=null; render(); };
+window.changeEditDate = function(v){ state.mEditDate=v; state.mEditSession=null; state.mEditSlot=null; render(); };
+window.changeEditPax = function(d){
+  state.mEditPax = Math.max(1, Math.min(MAX_PAX, state.mEditPax+d));
+  state.mEditSession=null; state.mEditSlot=null;
+  render();
+};
+window.pickEditSlot = function(sKey, slotMin){ state.mEditSession=sKey; state.mEditSlot=slotMin; state.mEditError=""; render(); };
+window.saveEditBooking = async function(id){
+  await refreshData();
+  const r = state.reservations.find(x=>x.id===id);
+  if(!r){ state.mEditError="This booking could not be found anymore."; render(); return; }
+  const alloc = slotFeasible(state.mEditDate, state.mEditSession, state.mEditSlot, state.mEditPax, r.id);
+  if(!alloc){ state.mEditError="Sorry, that slot cannot fit your party. Try another slot."; render(); return; }
+  if(state.mEditPax > r.pax){
+    r.pending = { date: state.mEditDate, session: state.mEditSession, slot: state.mEditSlot, pax: state.mEditPax };
+  } else {
+    r.date = state.mEditDate; r.session = state.mEditSession; r.slot = state.mEditSlot; r.pax = state.mEditPax;
+    r.tables = alloc.map(t=>t.id); r.pending = null;
+  }
+  await saveReservations(state.reservations);
+  state.mEditingId = null;
+  await findBooking();
+};
+window.doCancel = async function(id){
+  await refreshData();
+  const r = state.reservations.find(x=>x.id===id);
+  if(r){ r.status="cancelled"; await saveReservations(state.reservations); }
+  state.mMsg = "Your reservation has been cancelled. Thanks for letting us know!";
+  await findBooking();
+};
+
+/* =========================================================================
+   STAFF — PIN GATE
+   ========================================================================= */
+function renderStaffGateInner(){
+  return `
+    <div class="staff-pin-wrap">
+      <div class="eyebrow" style="text-align:center;">Staff Only</div>
+      <h1 class="section-title" style="color:var(--text-on-ink);">Enter PIN</h1>
+      <div class="field">
+        <input type="text" inputmode="numeric" class="pin-input" maxlength="8" value="${escapeAttr(state.pinInput)}"
+          style="background:var(--ink-2);border:1.5px solid var(--line-on-ink);color:var(--text-on-ink);"
+          oninput="state.pinInput=this.value" onkeydown="if(event.key==='Enter') checkPin();">
+      </div>
+      ${state.pinError?`<div class="error-box">${state.pinError}</div>`:""}
+      <button class="btn-primary" style="background:var(--brass);color:var(--ink);" onclick="checkPin()">Enter</button>
+    </div>
+  `;
+}
+window.checkPin = async function(){
+  const s = await loadSettings();
+  state.settings = s;
+  if(state.pinInput === s.pin){
+    await refreshData();
+    state.customerNotes = await loadCustomerNotes();
+    state.staffAuthed = true; state.view="staff"; state.pinError=""; state.pinInput="";
+    render();
+  } else {
+    state.pinError = "Incorrect PIN.";
+    render();
+  }
+};
+
+/* =========================================================================
+   STAFF — DASHBOARD
+   ========================================================================= */
+function renderStaffInner(){
+  const tabs = `
+    <div class="navpill sub">
+      <button class="${state.staffTab==='board'?'active':''}" onclick="state.staffTab='board';render();">Board</button>
+      <button class="${state.staffTab==='customers'?'active':''}" onclick="state.staffTab='customers';render();">Customers</button>
+      <button class="${state.staffTab==='closures'?'active':''}" onclick="state.staffTab='closures';render();">Closures</button>
+      <button class="${state.staffTab==='settings'?'active':''}" onclick="state.staffTab='settings';render();">Settings</button>
+    </div>
+  `;
+  let body;
+  if(state.staffTab==="board") body = renderBoard();
+  else if(state.staffTab==="customers") body = renderCustomers();
+  else if(state.staffTab==="closures") body = renderClosures();
+  else body = renderSettings();
+  return tabs + body;
+}
+
+function toCSVField(v){ const s=(v===undefined||v===null)?"":String(v); return '"'+s.replace(/"/g,'""')+'"'; }
+function exportCSV(list, filename){
+  const headers = ["Date","Session","Time","Name","Phone","Email","Pax","Tables","Status","Code","Booked At"];
+  const rows = list.map(r=>[r.date, SESSION_DEFS[r.session]?SESSION_DEFS[r.session].label:r.session, fmtTime(r.slot), r.name, r.phone, r.email||"", r.pax, r.tables.join(" "), r.status, r.code, new Date(r.createdAt).toISOString()]);
+  const csv = [headers, ...rows].map(row=>row.map(toCSVField).join(",")).join("\r\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+window.exportDay = function(){ exportCSV(state.reservations.filter(r=>r.date===state.dashDate), `bookings-${state.dashDate}.csv`); };
+window.exportRange = function(){
+  const from = state.dashRangeFrom, to = state.dashRangeTo;
+  exportCSV(state.reservations.filter(r=>r.date>=from && r.date<=to), `bookings-${from}-to-${to}.csv`);
+};
+window.exportAll = function(){ exportCSV(state.reservations, "bookings-all.csv"); };
+
+function renderBoard(){
+  const dateStr = state.dashDate;
+  const dayResv = state.reservations.filter(r=>r.date===dateStr && r.status!=="cancelled");
+  const activePax = dayResv.filter(r=>r.status==="confirmed"||r.status==="seated").reduce((s,r)=>s+r.pax,0);
+  const totalCap = state.tables.reduce((s,t)=>s+t.cap,0);
+  const seatedNow = state.reservations.filter(r=>r.date===dateStr && r.status==="seated").length;
+  const pendingAll = state.reservations.filter(r=>r.pending && r.status==="confirmed");
+
+  let pendingHtml = "";
+  if(pendingAll.length){
+    pendingHtml = `<div class="settings-block"><h3>Pending change requests (${pendingAll.length})</h3>` +
+      pendingAll.map(r=>{
+        const flag = customerFlag(r.phone);
+        return `<div class="resv-row">
+          <div class="resv-top"><div>
+            <div class="resv-name">${escapeHtml(r.name)}${flag.flagged?' <span class="status-pill pill-flag">FLAGGED</span>':''}</div>
+            <div class="resv-meta">Currently: ${fmtDateLong(r.date)} · ${fmtTime(r.slot)} · ${r.pax} pax · Tables ${r.tables.join(", ")}</div>
+          </div></div>
+          <div class="pending-box" style="margin-top:8px;">Requesting: ${fmtDateLong(r.pending.date)} · ${fmtTime(r.pending.slot)} · ${r.pending.pax} pax</div>
+          <div class="resv-actions">
+            <button class="act-btn primary" onclick="approvePending('${r.id}')">Approve — reassign tables</button>
+            <button class="act-btn" onclick="declinePending('${r.id}')">Decline</button>
+          </div>
+        </div>`;
+      }).join("") + `</div>`;
+  }
+
+  let sessionsHtml = "";
+  const sessions = sessionsForDateStr(dateStr);
+  if(isDateClosed(dateStr)){
+    sessionsHtml = `<p class="empty-note">This date is marked closed.</p>`;
+  } else if(sessions.length===0){
+    sessionsHtml = `<p class="empty-note">Closed on this date.</p>`;
+  } else {
+    sessions.forEach(sKey=>{
+      const rows = state.reservations
+        .filter(r=>r.date===dateStr && r.session===sKey)
+        .sort((a,b)=> a.slot-b.slot || a.name.localeCompare(b.name));
+      sessionsHtml += `<div class="session-header">${SESSION_DEFS[sKey].label}${isSessionClosed(dateStr,sKey)?' · CLOSED':''}</div>`;
+      if(rows.length===0){ sessionsHtml += `<p class="empty-note">No reservations yet.</p>`; }
+      else { rows.forEach(r=> sessionsHtml += renderResvRow(r)); }
+    });
+  }
+
+  return `
+    ${pendingHtml}
+    <div class="dash-date-row">
+      <input type="date" value="${dateStr}" onchange="state.dashDate=this.value; render();">
+      <button class="btn-ghost-ink" onclick="refreshBoard()">Refresh</button>
+      <button class="btn-ghost-ink" onclick="exportDay()">Export Day (CSV)</button>
+    </div>
+    <div class="dash-summary">
+      <div class="sum-chip"><div class="k">Booked Pax</div><div class="v">${activePax} / ${totalCap}</div></div>
+      <div class="sum-chip"><div class="k">Currently Seated</div><div class="v">${seatedNow}</div></div>
+      <div class="sum-chip"><div class="k">Reservations</div><div class="v">${dayResv.length}</div></div>
+    </div>
+    ${sessionsHtml}
+    <div class="settings-block" style="margin-top:22px;">
+      <h3>Bulk export</h3>
+      <div class="table-row-edit" style="grid-template-columns:1fr 1fr auto;">
+        <input type="date" value="${state.dashRangeFrom}" onchange="state.dashRangeFrom=this.value;">
+        <input type="date" value="${state.dashRangeTo}" onchange="state.dashRangeTo=this.value;">
+        <button class="act-btn" onclick="exportRange()">Export Range</button>
+      </div>
+      <button class="act-btn" style="margin-top:6px;" onclick="exportAll()">Export All-Time (CSV)</button>
+    </div>
+  `;
+}
+
+function renderResvRow(r){
+  const nowMs = Date.now();
+  const flag = customerFlag(r.phone);
+  let rowClass="", pillClass="pill-confirmed", pillLabel=r.status, extra="";
+  if(r.status==="confirmed"){
+    const nowMin = nowMinutes();
+    if(isToday(r.date) && nowMin > r.slot+10 && nowMin < r.slot+45){ extra = `<span class="resv-late">LATE</span>`; }
+    pillClass="pill-confirmed"; pillLabel="confirmed";
+  } else if(r.status==="seated"){
+    const elapsedMin = (nowMs - r.seatedAt)/60000;
+    if(elapsedMin>90){ rowClass="status-seated-over"; pillClass="pill-over"; pillLabel="overdue"; }
+    else if(elapsedMin>=75){ rowClass="status-seated-warn"; pillClass="pill-warn"; pillLabel="wrapping up"; }
+    else { rowClass="status-seated-ok"; pillClass="pill-seated"; pillLabel="seated"; }
+  } else if(r.status==="cancelled"){ rowClass="status-done"; pillClass="pill-cancelled"; pillLabel="cancelled"; }
+  else if(r.status==="no-show"){ rowClass="status-done"; pillClass="pill-noshow"; pillLabel="no-show"; }
+  else if(r.status==="completed"){ rowClass="status-done"; pillClass="pill-done"; pillLabel="completed"; }
+
+  let actions="";
+  if(r.status==="confirmed"){
+    actions = `
+      <button class="act-btn primary" onclick="seatResv('${r.id}')">Seat</button>
+      <button class="act-btn" onclick="noShowResv('${r.id}')">No-show</button>
+      <button class="act-btn danger" onclick="cancelResvStaff('${r.id}')">Cancel</button>
+    `;
+  } else if(r.status==="seated"){
+    actions = `
+      <button class="act-btn primary" onclick="completeResv('${r.id}')">Complete</button>
+      <button class="act-btn danger" onclick="cancelResvStaff('${r.id}')">Cancel</button>
+    `;
+  } else {
+    actions = `<button class="act-btn" onclick="reopenResv('${r.id}')">Reopen</button>`;
+  }
+
+  return `
+    <div class="resv-row ${rowClass}">
+      <div class="resv-top">
+        <div>
+          <span class="resv-time">${fmtTime(r.slot)}</span>${extra}
+          <div class="resv-name">${escapeHtml(r.name)} · ${r.pax} pax${flag.flagged?' <span class="status-pill pill-flag">FLAGGED</span>':''}${r.pending?' <span class="status-pill pill-pending">PENDING CHANGE</span>':''}</div>
+          <div class="resv-meta">${escapeHtml(r.phone)} · Tables ${r.tables.join(", ")} · Code ${r.code}</div>
+        </div>
+        <span class="status-pill ${pillClass}">${pillLabel}</span>
+      </div>
+      <div class="resv-actions">${actions}</div>
+    </div>
+  `;
+}
+window.refreshBoard = async function(){ await refreshData(); render(); };
+async function mutateResv(id, fn){
+  await refreshData();
+  const r = state.reservations.find(x=>x.id===id);
+  if(r) fn(r);
+  await saveReservations(state.reservations);
+  render();
+}
+window.seatResv = (id)=> mutateResv(id, r=>{ r.status="seated"; r.seatedAt=Date.now(); });
+window.completeResv = (id)=> mutateResv(id, r=>{ r.status="completed"; });
+window.noShowResv = (id)=> mutateResv(id, r=>{ r.status="no-show"; });
+window.cancelResvStaff = (id)=> mutateResv(id, r=>{ r.status="cancelled"; });
+window.reopenResv = (id)=> mutateResv(id, r=>{ r.status="confirmed"; r.seatedAt=null; });
+window.approvePending = async function(id){
+  await refreshData();
+  const r = state.reservations.find(x=>x.id===id);
+  if(r && r.pending){
+    const alloc = slotFeasible(r.pending.date, r.pending.session, r.pending.slot, r.pending.pax, r.id);
+    if(!alloc){ alert("That slot no longer has room — decline it and rebook manually, or ask the guest to pick another time."); return; }
+    r.date=r.pending.date; r.session=r.pending.session; r.slot=r.pending.slot; r.pax=r.pending.pax;
+    r.tables = alloc.map(t=>t.id); r.pending=null;
+    await saveReservations(state.reservations);
+  }
+  render();
+};
+window.declinePending = async function(id){
+  await refreshData();
+  const r = state.reservations.find(x=>x.id===id);
+  if(r){ r.pending=null; await saveReservations(state.reservations); }
+  render();
+};
+
+/* ---------------- customers tab ---------------- */
+function renderCustomers(){
+  const map = {};
+  state.reservations.forEach(r=>{
+    const key = normPhone(r.phone);
+    if(!map[key]) map[key] = {phone:r.phone, email:r.email||"", name:r.name, bookings:0, noshow:0, cancelled:0, lastSeen:0};
+    const m = map[key];
+    m.bookings++;
+    if(r.status==="no-show") m.noshow++;
+    if(r.status==="cancelled") m.cancelled++;
+    if(r.createdAt>=m.lastSeen){ m.lastSeen=r.createdAt; m.name=r.name; m.email=r.email||m.email; }
+  });
+  const rows = Object.values(map).sort((a,b)=> b.noshow-a.noshow || b.lastSeen-a.lastSeen);
+  const body = rows.length===0 ? `<p class="empty-note">No guest history yet.</p>` : `
+    <table class="tbl"><thead><tr><th>Guest</th><th>Contact</th><th>Visits</th><th>No-shows</th><th>Flag</th><th>Note</th></tr></thead>
+    <tbody>${rows.map(r=>{
+      const key = normPhone(r.phone);
+      const note = state.customerNotes[key] || {flagged:false, note:""};
+      return `<tr>
+        <td>${escapeHtml(r.name)}</td>
+        <td style="font-size:11.5px;">${escapeHtml(r.phone)}<br>${escapeHtml(r.email)}</td>
+        <td>${r.bookings}</td>
+        <td>${r.noshow}</td>
+        <td><input type="checkbox" ${note.flagged?'checked':''} onchange="toggleFlag('${key}', this.checked)"></td>
+        <td><input type="text" value="${escapeAttr(note.note)}" placeholder="Internal note" onchange="setNote('${key}', this.value)" style="min-width:140px;"></td>
+      </tr>`;
+    }).join("")}</tbody></table>`;
+  return `
+    <div class="settings-block">
+      <h3>Guest history</h3>
+      <p class="section-desc" style="color:var(--text-muted-on-ink);">Built from your reservation records — visits, no-shows and cancellations. Flag repeat no-shows or leave a note. Staff only, never shown to guests.</p>
+      ${body}
+    </div>
+  `;
+}
+window.toggleFlag = async function(key, checked){
+  state.customerNotes[key] = state.customerNotes[key] || {flagged:false, note:""};
+  state.customerNotes[key].flagged = checked;
+  await saveCustomerNotes();
+};
+window.setNote = async function(key, val){
+  state.customerNotes[key] = state.customerNotes[key] || {flagged:false, note:""};
+  state.customerNotes[key].note = val;
+  await saveCustomerNotes();
+};
+
+/* ---------------- closures tab ---------------- */
+function renderClosures(){
+  const d = state.clDate;
+  const sessions = sessionsForDateStr(d);
+  let picker = `<label class="field-label" style="display:block;margin-top:12px;">
+    <input type="checkbox" id="cl-wholeday" style="width:auto;margin-right:6px;"> Close the whole day</label>`;
+  if(sessions.length===0){
+    picker += `<p class="empty-note">Already closed this day (Monday).</p>`;
+  } else {
+    sessions.forEach(sKey=>{
+      picker += `<div class="field-label" style="margin-top:10px;">${SESSION_DEFS[sKey].label}</div>`;
+      picker += `<label class="field-label" style="text-transform:none;font-weight:400;"><input type="checkbox" class="cl-session-cb" data-session="${sKey}" style="width:auto;margin-right:6px;"> Close whole service</label>`;
+      slotsFor(sKey).forEach(sl=>{
+        picker += `<label class="field-label" style="text-transform:none;font-weight:400;display:block;margin:4px 0;">
+          <input type="checkbox" class="cl-slot-cb" data-session="${sKey}" value="${sl}" style="width:auto;margin-right:6px;"> ${fmtTime(sl)}</label>`;
+      });
+    });
+  }
+  const byDate = {};
+  state.closures.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(c=>{ (byDate[c.date]=byDate[c.date]||[]).push(c); });
+  const listHtml = Object.keys(byDate).length===0 ? `<p class="empty-note">No closures set.</p>` :
+    Object.keys(byDate).map(dd=>{
+      const items = byDate[dd].map(c=>{
+        let label;
+        if(c.session===null) label = "Whole day";
+        else if(c.slot===null) label = SESSION_DEFS[c.session].label;
+        else label = SESSION_DEFS[c.session].label+" · "+fmtTime(c.slot);
+        return `<span class="chip">${label} <span onclick="removeClosure('${dd}','${c.session===null?'':c.session}','${c.slot===null?'':c.slot}')" style="cursor:pointer;color:var(--ember-bright);margin-left:4px;">&times;</span></span>`;
+      }).join(" ");
+      return `<div class="resv-row"><div class="resv-name">${fmtDateLong(dd)}</div><div style="margin-top:6px;">${items}</div></div>`;
+    }).join("");
+
+  return `
+    <div class="settings-block">
+      <h3>Closures</h3>
+      <p class="section-desc" style="color:var(--text-muted-on-ink);">Turn off a whole date, or just specific seatings — for emergencies, power failures, private events. Existing reservations aren't cancelled automatically.</p>
+      <div class="field">
+        <label class="field-label">Date</label>
+        <input type="date" value="${d}" onchange="state.clDate=this.value; render();">
+      </div>
+      ${picker}
+      <button class="act-btn primary" style="margin-top:12px;" onclick="addClosure()">Add Closure</button>
+    </div>
+    <div class="settings-block"><h3>Current closures</h3>${listHtml}</div>
+  `;
+}
+window.addClosure = async function(){
+  const d = state.clDate;
+  const wholeDay = document.getElementById("cl-wholeday") && document.getElementById("cl-wholeday").checked;
+  if(wholeDay){
+    if(!state.closures.find(c=>c.date===d && c.session===null && c.slot===null)) state.closures.push({date:d, session:null, slot:null});
+  } else {
+    document.querySelectorAll(".cl-session-cb:checked").forEach(cb=>{
+      const s = cb.dataset.session;
+      if(!state.closures.find(c=>c.date===d && c.session===s && c.slot===null)) state.closures.push({date:d, session:s, slot:null});
+    });
+    document.querySelectorAll(".cl-slot-cb:checked").forEach(cb=>{
+      const s = cb.dataset.session, slot = parseInt(cb.value,10);
+      if(!state.closures.find(c=>c.date===d && c.session===s && c.slot===slot)) state.closures.push({date:d, session:s, slot:slot});
+    });
+  }
+  await saveClosures();
+  render();
+};
+window.removeClosure = async function(d, session, slot){
+  const sessionVal = session===""?null:session;
+  const slotVal = slot===""?null:parseInt(slot,10);
+  state.closures = state.closures.filter(c=> !(c.date===d && c.session===sessionVal && c.slot===slotVal));
+  await saveClosures();
+  render();
+};
+
+/* ---------------- settings tab ---------------- */
+function renderSettings(){
+  if(!state.editTables) state.editTables = JSON.parse(JSON.stringify(state.tables));
+  const rows = state.editTables.map((t,i)=>{
+    const groupOpts = `<option value="">No group</option>` + state.groups.map(g=>`<option value="${g.id}" ${t.group===g.id?'selected':''}>${escapeHtml(g.name)}</option>`).join("");
+    return `
+    <div class="table-row-edit">
+      <input type="text" value="${escapeAttr(t.id)}" oninput="state.editTables[${i}].id=this.value">
+      <input type="number" min="1" value="${t.cap}" oninput="state.editTables[${i}].cap=parseInt(this.value||'0')">
+      <select onchange="state.editTables[${i}].group=this.value||null;">${groupOpts}</select>
+      <button class="icon-btn" onclick="removeTableRow(${i})">✕</button>
+    </div>`;
+  }).join("");
+  const totalCap = state.editTables.reduce((s,t)=>s+(t.cap||0),0);
+
+  const groupsList = state.groups.length===0 ? `<p class="empty-note">No groups yet — tables act on their own.</p>` :
+    state.groups.map(g=>{
+      const members = state.tables.filter(t=>t.group===g.id).map(t=>t.id);
+      return `<div class="resv-row"><div class="resv-top"><div class="resv-name">${escapeHtml(g.name)}</div><button class="act-btn" onclick="editGroup('${g.id}')">Edit</button></div>
+        <div style="margin-top:6px;">${members.map(m=>`<span class="chip">${m}</span>`).join("") || "No tables yet"}</div></div>`;
+    }).join("");
+  const ge = state.groupEditor;
+  const picker = state.tables.map(t=>{
+    const lockedElsewhere = t.group && t.group!==ge.id;
+    const otherName = lockedElsewhere ? (state.groups.find(g=>g.id===t.group)||{}).name : "";
+    return `<label class="field-label" style="text-transform:none;font-weight:400;display:block;margin:4px 0;">
+      <input type="checkbox" style="width:auto;margin-right:6px;" ${ge.members.has(t.id)?'checked':''} ${lockedElsewhere?'disabled':''} onchange="toggleGroupMember('${t.id}', this.checked)">
+      ${t.id} (${t.cap} pax)${lockedElsewhere?` — already in "${escapeHtml(otherName)}"`:""}
+    </label>`;
+  }).join("");
+
+  const termsText = state.settings.terms.join("\n");
+
+  return `
+    <div class="settings-block">
+      <div class="eyebrow">Tables</div>
+      <p class="section-desc" style="color:var(--text-muted-on-ink);">Define your tables, capacities and (optionally) which group they belong to. The system auto-allocates the smallest combination of tables that fits each party — never combining tables across different groups.</p>
+      ${rows}
+      <button class="act-btn" onclick="addTableRow()">+ Add Table</button>
+      <p style="font-size:12px;color:var(--text-muted-on-ink);margin:10px 0 0;">Total capacity: <b class="mono">${totalCap} pax</b></p>
+      <button class="btn-primary" style="background:var(--brass);color:var(--ink);margin-top:14px;" onclick="saveTableEdits()">Save Tables</button>
+    </div>
+
+    <div class="settings-block">
+      <div class="eyebrow">Table groups</div>
+      <p class="section-desc" style="color:var(--text-muted-on-ink);">Tie neighbouring tables together (e.g. A1+A2+A3 = a 6-top) so a large party can be seated across them.</p>
+      ${groupsList}
+      <div class="field" style="margin-top:12px;">
+        <label class="field-label">Group name</label>
+        <input type="text" value="${escapeAttr(ge.name)}" placeholder="e.g. Row A window side" oninput="state.groupEditor.name=this.value">
+      </div>
+      <label class="field-label">Tables in this group</label>
+      ${picker}
+      ${state.groupError?`<div class="error-box">${state.groupError}</div>`:""}
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+        <button class="act-btn primary" onclick="saveGroup()">${ge.id?'Update Group':'Create Group'}</button>
+        ${ge.id?`<button class="act-btn danger" onclick="deleteGroup()">Delete Group</button><button class="act-btn" onclick="resetGroupEditor()">New Group</button>`:""}
+      </div>
+    </div>
+
+    <div class="settings-block">
+      <div class="eyebrow">General</div>
+      <div class="field" style="margin-top:8px;">
+        <label class="field-label">Restaurant name</label>
+        <input type="text" value="${escapeAttr(state.settings.restaurantName)}" oninput="state.settings.restaurantName=this.value">
+      </div>
+      <div class="field">
+        <label class="field-label">Restaurant phone</label>
+        <input type="text" value="${escapeAttr(state.settings.restaurantPhone)}" oninput="state.settings.restaurantPhone=this.value">
+      </div>
+      <div class="field">
+        <label class="field-label">Max pax per seating slot</label>
+        <input type="number" min="1" value="${state.settings.maxPaxPerSlot}" oninput="state.settings.maxPaxPerSlot=parseInt(this.value||'1')">
+      </div>
+      <div class="field">
+        <label class="field-label">Terms shown to guests (one per line)</label>
+        <textarea rows="5" oninput="state.settings.terms=this.value.split('\\n').filter(x=>x.trim());">${escapeHtml(termsText)}</textarea>
+      </div>
+      <button class="btn-primary" style="background:var(--brass);color:var(--ink);" onclick="saveGeneralSettings()">Save General Settings</button>
+    </div>
+
+    <div class="settings-block">
+      <div class="eyebrow">Staff PIN</div>
+      <div class="field" style="margin-top:8px;">
+        <input type="text" placeholder="New PIN" value="${escapeAttr(state.newPin)}" oninput="state.newPin=this.value">
+      </div>
+      <button class="btn-primary" style="background:var(--brass);color:var(--ink);" onclick="changePin()">Update PIN</button>
+    </div>
+    ${state.settingsMsg?`<div class="info-box">${state.settingsMsg}</div>`:""}
+  `;
+}
+window.addTableRow = function(){ state.editTables.push({id:"T"+(state.editTables.length+1), cap:2, group:null}); render(); };
+window.removeTableRow = function(i){ state.editTables.splice(i,1); render(); };
+window.saveTableEdits = async function(){
+  const clean = state.editTables.filter(t=>t.id && t.cap>0);
+  state.tables = clean;
+  state.editTables = JSON.parse(JSON.stringify(clean));
+  await saveTablesConfig();
+  state.settingsMsg = "Tables saved.";
+  render();
+};
+window.toggleGroupMember = function(tid, checked){
+  if(checked) state.groupEditor.members.add(tid); else state.groupEditor.members.delete(tid);
+};
+window.editGroup = function(id){
+  const g = state.groups.find(x=>x.id===id);
+  const members = new Set(state.tables.filter(t=>t.group===id).map(t=>t.id));
+  state.groupEditor = {id:g.id, name:g.name, members};
+  render();
+};
+window.resetGroupEditor = function(){ state.groupEditor = {id:null,name:"",members:new Set()}; render(); };
+window.saveGroup = async function(){
+  const ge = state.groupEditor;
+  if(!ge.name.trim() || ge.members.size<2){ state.groupError = "Give the group a name and pick at least 2 tables."; render(); return; }
+  state.groupError = "";
+  const id = ge.id || genId();
+  const idx = state.groups.findIndex(g=>g.id===id);
+  const groupObj = {id, name:ge.name.trim()};
+  if(idx>=0) state.groups[idx]=groupObj; else state.groups.push(groupObj);
+  state.tables.forEach(t=>{ if(ge.members.has(t.id)) t.group=id; else if(t.group===id) t.group=null; });
+  state.editTables = JSON.parse(JSON.stringify(state.tables));
+  await saveTablesConfig();
+  state.groupEditor = {id:null,name:"",members:new Set()};
+  render();
+};
+window.deleteGroup = async function(){
+  state.groups = state.groups.filter(g=>g.id!==state.groupEditor.id);
+  state.tables.forEach(t=>{ if(t.group===state.groupEditor.id) t.group=null; });
+  state.editTables = JSON.parse(JSON.stringify(state.tables));
+  await saveTablesConfig();
+  state.groupEditor = {id:null,name:"",members:new Set()};
+  render();
+};
+window.saveGeneralSettings = async function(){
+  await saveSettings(state.settings);
+  state.settingsMsg = "Settings saved.";
+  render();
+};
+window.changePin = async function(){
+  if(!state.newPin.trim()){ return; }
+  state.settings.pin = state.newPin.trim();
+  await saveSettings(state.settings);
+  state.settingsMsg = "PIN updated.";
+  state.newPin="";
+  render();
+};
+
+/* ---------------- utils ---------------- */
+function escapeHtml(s){ return String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function escapeAttr(s){ return escapeHtml(s); }
+
+/* ---------------- boot + periodic refresh ---------------- */
+bootstrap();
+setInterval(()=>{
+  if(state.view==="reserve" && !state.rConfirmed) render();
+  if(state.view==="staff" && state.staffTab==="board"){ refreshData().then(render); }
+}, 20000);
+</script>
+</body>
+</html>
