@@ -315,7 +315,13 @@ function computeNowTag(dateStr){
   return null;
 }
 function customerFlag(phone){ return state.customerNotes[normPhone(phone)] || {flagged:false, note:""}; }
-
+if(!window.storage){
+  window.storage = {
+    async get(key){ const v = localStorage.getItem(key); return v===null ? null : {value:v}; },
+    async set(key, value){ localStorage.setItem(key, value); }
+  };
+}
+  
 /* ---------------- storage layer ---------------- */
 async function loadTablesConfig(){
   try{
