@@ -567,13 +567,14 @@ function renderTicketInner(resv){
       <div class="ticket-body">
         <div class="eyebrow">Reservation Confirmed</div>
         <h1 class="section-title">See you soon, ${escapeHtml(resv.name.split(" ")[0])}.</h1>
-        <p class="section-desc">Show this confirmation code at the door. No need to print anything.</p>
-        <div class="stub-code">${resv.code}</div>
+                <p class="section-desc">Here's a summary of your booking for your records.</p>
         <div class="stub-grid">
           <div class="stub-item"><div class="k">Date</div><div class="v">${fmtDateLong(resv.date)}</div></div>
           <div class="stub-item"><div class="k">Time</div><div class="v">${fmtTime(resv.slot)}</div></div>
           <div class="stub-item"><div class="k">Party</div><div class="v">${resv.pax} pax</div></div>
           <div class="stub-item"><div class="k">Service</div><div class="v">${SESSION_DEFS[resv.session].label}</div></div>
+          <div class="stub-item"><div class="k">Phone</div><div class="v">${escapeHtml(resv.phone)}</div></div>
+          <div class="stub-item"><div class="k">Email</div><div class="v">${escapeHtml(resv.email)}</div></div>
         </div>
       </div>
       <div class="ticket-tear"></div>
