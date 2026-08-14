@@ -162,6 +162,7 @@
     .table-row-edit{grid-template-columns:1fr;}
   }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div id="root"></div>
@@ -315,12 +316,19 @@ function computeNowTag(dateStr){
   return null;
 }
 function customerFlag(phone){ return state.customerNotes[normPhone(phone)] || {flagged:false, note:""}; }
-if(!window.storage){
-  window.storage = {
-    async get(key){ const v = localStorage.getItem(key); return v===null ? null : {value:v}; },
-    async set(key, value){ localStorage.setItem(key, value); }
-  };
-}
+const SUPABASE_URL = "https://qledqzcypmnwynkhsgcr.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable__LtkwbrnkmUlt0KqxQWS3w_o_1mxDwN";
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+window.storage = {
+  async get(key){
+    const { data, error } = await _sb.from("app_data").select("value").eq("key", key).maybeSingle();
+    if(error || !data) return null;
+    return { value: data.value };
+  },
+  async set(key, value){
+    await _sb.from("app_data").upsert({ key, value });
+  }
+};
   
 /* ---------------- storage layer ---------------- */
 async function loadTablesConfig(){
