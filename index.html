@@ -102,10 +102,12 @@
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script src="shared.js"></script>
 </head>
 <body>
 <div id="root"></div>
+<div id="turnstile-box" style="display:none;"></div>
 
 <script>
 /* =========================================================================
@@ -113,6 +115,39 @@
    Booking + Manage Booking only. No staff code lives on this page at all —
    see shared.js for the constants/helpers this shares with staff.html.
    ========================================================================= */
+
+const TURNSTILE_SITE_KEY = "0x4AAAAAAFOWGfeCBeibrmsA";
+const SUBMIT_RESERVATION_URL = "https://qledqzcypmnwynkhsgcr.supabase.co/functions/v1/submit-reservation";
+
+/* ---------------- bot verification (Turnstile) ----------------
+   Invisible widget, lives in the fixed #turnstile-box above (outside
+   anything render() ever rewrites), so it survives every re-render. */
+let _turnstileReady = false;
+let _turnstileWidgetId = null;
+let _turnstileResolve = null;
+function initTurnstile(attempt){
+  attempt = attempt || 0;
+  if(window.turnstile){
+    _turnstileWidgetId = turnstile.render("#turnstile-box", {
+      sitekey: TURNSTILE_SITE_KEY,
+      size: "invisible",
+      callback: function(token){ if(_turnstileResolve){ _turnstileResolve(token); _turnstileResolve=null; } },
+      "error-callback": function(){ if(_turnstileResolve){ _turnstileResolve(null); _turnstileResolve=null; } }
+    });
+    _turnstileReady = true;
+    return;
+  }
+  if(attempt < 50){ setTimeout(function(){ initTurnstile(attempt+1); }, 200); }
+}
+function getTurnstileToken(){
+  return new Promise(function(resolve){
+    if(!_turnstileReady){ resolve(null); return; }
+    _turnstileResolve = resolve;
+    turnstile.reset(_turnstileWidgetId);
+    turnstile.execute(_turnstileWidgetId);
+    setTimeout(function(){ if(_turnstileResolve){ _turnstileResolve(null); _turnstileResolve=null; } }, 8000);
+  });
+}
 
 /* ---------------- app state ---------------- */
 const state = {
@@ -292,12 +327,28 @@ window.submitReservation = async function(){
     pax: state.rPax, date: state.rDate, session: state.rSession, slot: state.rSlot,
     tables: alloc.map(t=>t.id), status: "confirmed", seatedAt: null, createdAt: Date.now(), pending: null
   };
-  const { error } = await _sb.rpc("create_reservation", {
-    p_id: resv.id, p_code: resv.code, p_name: resv.name, p_phone: resv.phone, p_email: resv.email,
-    p_pax: resv.pax, p_date: resv.date, p_session: resv.session, p_slot: resv.slot, p_tables: resv.tables
-  });
-  if(error){
-    state.rError = "Sorry — something went wrong saving your reservation. Please try again.";
+
+  const turnstileToken = await getTurnstileToken();
+  if(!turnstileToken){
+    state.rError = "Verification failed to load — please check your connection and try again, or call us to book directly.";
+    render(); return;
+  }
+
+  let result = null;
+  try{
+    const resp = await fetch(SUBMIT_RESERVATION_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: resv.id, code: resv.code, name: resv.name, phone: resv.phone, email: resv.email,
+        pax: resv.pax, date: resv.date, session: resv.session, slot: resv.slot, tables: resv.tables,
+        turnstileToken: turnstileToken
+      })
+    });
+    result = await resp.json();
+    if(!resp.ok) throw new Error(result.error || "Request failed");
+  }catch(e){
+    state.rError = (result && result.error) || "Sorry — something went wrong saving your reservation. Please try again.";
     render(); return;
   }
   state.rConfirmed = resv;
@@ -496,6 +547,7 @@ window.doCancel = async function(id){
 
 /* ---------------- boot + periodic refresh ---------------- */
 bootstrap();
+initTurnstile();
 setInterval(()=>{
   if(state.view==="reserve" && !state.rConfirmed) render();
 }, 20000);
